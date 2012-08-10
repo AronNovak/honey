@@ -1,0 +1,5 @@
+name=Honeypot module
+core=7.x
+dependencies[]=rules
+
+

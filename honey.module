@@ -1,0 +1,177 @@
+<?php
+/**
+ * @file
+ * Actions and events for portscanning visitors
+ */
+
+/**
+ * Implements hook_exit().
+ */
+function honey_exit() {
+  rules_invoke_event(
+    'honey_page_visit',
+    ip_address(),
+    $_SERVER['HTTP_USER_AGENT'],
+    current_path()
+  );
+}
+
+/**
+ * Tests a string against a regexp pattern
+ *
+ * @see honey_rules_condition_info().
+ */
+function honey_regexp_match($pattern, $subject) {
+  if (@preg_match($pattern, $subject)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Performs the actual portscanning
+ *
+ * @params
+ *   Array of incoming parameters from rules.
+ *
+ * @see honey_rules_action_info().
+ */
+function honey_portscan($params) {
+  if (filter_var($params['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+    $out = array();
+    exec("nmap {$params['ip']} | grep open | cut -d\/ -f1", $out);
+    $result = array(
+      'ip' => $params['ip'],
+      'ports' => join(', ', $out),
+    );
+    drupal_debug($result);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
