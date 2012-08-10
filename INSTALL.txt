@@ -1,0 +1,11 @@
+To make the module working correctly, it's needed to make sure
+that the nmap command-line utility is installed and available in
+the webserver's PATH.
+
+To figure out the PATH of the webserver, you may create a little
+temporary PHP script (or using devel module):
+--
+<?php
+system('echo $PATH');
+--
+If you use devel, don't enter the first line.
