@@ -17,6 +17,18 @@ function honey_exit() {
 }
 
 /**
+ * Implements hook_cron_queue_info().
+ */
+function honey_cron_queue_info() {
+  return array(
+    'honey_scan' => array(
+      'worker callback' => 'honey_portscan_perform',
+      'time' => 240,
+    ),
+  );
+}
+
+/**
  * Tests a string against a regexp pattern
  *
  * @see honey_rules_condition_info().
@@ -29,22 +41,32 @@ function honey_regexp_match($pattern, $subject) {
 }
 
 /**
- * Performs the actual portscanning
+ * Enqueues the IP for scanning
  *
- * @params
+ * @param $params
  *   Array of incoming parameters from rules.
  *
  * @see honey_rules_action_info().
  */
 function honey_portscan($params) {
   if (filter_var($params['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-    $out = array();
-    exec("nmap {$params['ip']} | grep open | cut -d\/ -f1", $out);
-    $result = array(
-      'ip' => $params['ip'],
-      'ports' => join(', ', $out),
-    );
-    drupal_debug($result);
+    $queue = DrupalQueue::get('honey_scan');
+    $queue->createItem($params['ip']);
   }
+}
+
+/**
+ * Performs the portscanning using nmap.
+ * The result is stored in drupal_debug.txt
+ * inside the Drupal's standard tmp dir.
+ */
+function honey_portscan_perform($ip) {
+  $out = array();
+  exec("nmap $ip | grep open | cut -d\/ -f1", $out);
+  $result = array(
+    'ip' => $ip,
+    'ports' => join(', ', $out),
+  );
+  drupal_debug($result);
 }
 
